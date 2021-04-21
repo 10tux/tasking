@@ -77,3 +77,10 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
+  fonts:
+    - family: Lexend
+      fonts:
+        - asset: fonts/Lexend-Regular.ttf
+    - family: Rubik
+      fonts:
+        - asset: fonts/Rubik-Regular.ttf

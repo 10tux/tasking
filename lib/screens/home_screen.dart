@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../logic/database.dart';
 
 class MyHomePage extends StatelessWidget {
   MyHomePage({Key key, this.title}) : super(key: key);
@@ -81,7 +82,7 @@ class _TaskWidgetState extends State<TaskWidget> {
           Icons.cancel,
           color: Colors.red,
         ),
-        onPressed: () => {},
+        onPressed: () => {openAndCloseDb()},
         splashRadius: 18.0,
       ),
       title: Text("task"),
