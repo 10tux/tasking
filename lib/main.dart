@@ -26,6 +26,20 @@ class MyApp extends StatefulWidget {
 
 /// State for `MyApp`
 class _MyAppState extends State<MyApp> {
+  @override
+  void initState() {
+    super.initState();
+    _setUpDatabase();
+  }
+
+  void _setUpDatabase() async {
+    if (!await DatabaseProvider.checkIfDatabaseExists()) {
+      DatabaseProvider.createDatabase();
+    }
+
+    Provider.of<DatabaseProvider>(context, listen: false).loadTasks();
+  }
+
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
@@ -33,57 +47,9 @@ class _MyAppState extends State<MyApp> {
       title: 'Flutter Demo',
       theme: ThemeData(
         primarySwatch: Colors.blue,
-        fontFamily: 'Lexend',
+        fontFamily: 'Quicksand',
       ),
-      home: Consumer<DatabaseProvider>(
-        builder: (context, dbProvider, child) {
-          if (dbProvider.dbStatus == DatabaseStatus.Loaded) {
-            return MyHomePage(title: 'Tasking');
-          } else {
-            return LoadingPage();
-          }
-        },
-      ),
-    );
-  }
-}
-
-class LoadingPage extends StatefulWidget {
-  @override
-  State<StatefulWidget> createState() => _LoadingPageState();
-}
-
-class _LoadingPageState extends State<LoadingPage> {
-  @override
-  void initState() {
-    super.initState();
-    _loadDatabase();
-  }
-
-  void _loadDatabase() async {
-    // check if database file exists
-    if (await DatabaseProvider.checkIfDatabaseExists()) {
-      //pass
-    } else {
-      Provider.of<DatabaseProvider>(context, listen: false).dbStatus =
-          DatabaseStatus.FileMissing;
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: Consumer<DatabaseProvider>(
-          builder: (context, dbProvider, child) {
-            if (dbProvider.dbStatus == DatabaseStatus.FileMissing) {
-              return Text('Database File Missing');
-            } else {
-              return Text('Database Loading');
-            }
-          },
-        ),
-      ),
+      home: MyHomePage(title: 'Tasking'),
     );
   }
 }
