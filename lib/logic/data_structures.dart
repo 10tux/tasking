@@ -16,4 +16,3 @@ class TaskItem {
 
 /// Possible values for task item status
 enum TaskItemStatus { Completed, Pending }
-

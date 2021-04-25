@@ -1,8 +1,8 @@
-import 'dart:collection';
-
 /// Database access and storage implementation
 /// Implemented based on sqlite3 database
 /// Currently supports only for Windows Desktop
+
+import 'dart:collection';
 
 import 'dart:ffi';
 import 'dart:io';
@@ -13,6 +13,10 @@ import 'package:sqlite3/open.dart';
 
 import 'data_structures.dart';
 
+/// get the directory where executable is located
+///
+/// Gets the build directory in windows, when in debug mode.
+/// Returns the directory of executable when executable is run directly
 String getFilesDirectory() {
   if (kDebugMode) {
     return '${Directory.current.path}\\build\\windows\\runner\\Debug';
@@ -21,6 +25,8 @@ String getFilesDirectory() {
   }
 }
 
+/// The class for storing database related methods. Also used with provider
+/// package for state management of the app.
 class DatabaseProvider extends ChangeNotifier {
   DatabaseStatus _status = DatabaseStatus.NotLoaded;
   var _tasksList = <TaskItem>[];
@@ -47,6 +53,11 @@ class DatabaseProvider extends ChangeNotifier {
     return DynamicLibrary.open(dllFile.path);
   }
 
+  /// load tasks from database and notify listeners
+  ///
+  /// Used for loading the task details into flutter widgets
+  /// After each operation in database, ensure to reload tasks
+  /// to update the user interface
   void loadTasks() {
     final db = sqlite3.open(
       '${getFilesDirectory()}\\tasking.db',
@@ -66,6 +77,7 @@ class DatabaseProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Add new task to database and set it's status to `pending`
   void addNewTask({String name}) {
     final db = sqlite3.open(
       '${getFilesDirectory()}\\tasking.db',
@@ -81,6 +93,7 @@ class DatabaseProvider extends ChangeNotifier {
     db.dispose();
   }
 
+  /// Delete an existing task from database
   void deleteTask({int taskId}) {
     final db = sqlite3.open(
       '${getFilesDirectory()}\\tasking.db',
@@ -91,6 +104,7 @@ class DatabaseProvider extends ChangeNotifier {
     db.dispose();
   }
 
+  /// Set the task status to either `completed` or `pending`
   void setTaskStatus({int taskId, TaskItemStatus status}) {
     final db = sqlite3.open(
       '${getFilesDirectory()}\\tasking.db',
@@ -152,7 +166,3 @@ class DatabaseProvider extends ChangeNotifier {
 
 /// Enum containing list of allowed database loading status.
 enum DatabaseStatus { Loaded, NotLoaded, FileMissing }
-
-/// Get sqlite3 dynamic library
-
-void openAndCloseDb() {}

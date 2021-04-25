@@ -12,7 +12,7 @@ void main() {
     providers: [
       ChangeNotifierProvider(create: (_) => DatabaseProvider()),
     ],
-    child: MyApp(),
+    child: MyApp(), // application root
   ));
 }
 
@@ -29,9 +29,12 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    _setUpDatabase();
+    _setUpDatabase(); // load tasks from database
   }
 
+  /// load and setup database
+  ///
+  /// If database exists load tasks else create database
   void _setUpDatabase() async {
     if (!await DatabaseProvider.checkIfDatabaseExists()) {
       DatabaseProvider.createDatabase();
@@ -40,16 +43,18 @@ class _MyAppState extends State<MyApp> {
     Provider.of<DatabaseProvider>(context, listen: false).loadTasks();
   }
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
-        fontFamily: 'Quicksand',
-      ),
-      home: MyHomePage(title: 'Tasking'),
+          primarySwatch: Colors.blue,
+          fontFamily: 'Inter',
+          textTheme: TextTheme(
+            subtitle1: TextStyle(fontSize: 14),
+            subtitle2: TextStyle(fontSize: 14),
+          )),
+      home: MyHomePage(title: 'Tasking'), // Landing page with task details
     );
   }
 }

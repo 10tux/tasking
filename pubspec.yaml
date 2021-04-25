@@ -85,6 +85,6 @@ flutter:
     - family: Rubik
       fonts:
         - asset: fonts/Rubik-Regular.ttf
-    - family: Quicksand
+    - family: Inter
       fonts:
-        - asset: fonts/Quicksand-Regular.ttf
+        - asset: fonts/Inter-Regular.ttf
