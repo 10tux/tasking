@@ -144,7 +144,7 @@ class DatabaseAccess {
       db.execute('''UPDATE tasks 
           SET 
             status="pending", 
-            completedon="NULL", 
+            completedon=NULL, 
             modifiedon=$currentTime 
           WHERE 
             task_id=$taskId''');
