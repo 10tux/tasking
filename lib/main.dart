@@ -12,7 +12,7 @@ void main() {
   runApp(MultiProvider(
     providers: [
       ChangeNotifierProvider(create: (_) => DatabaseProvider()),
-      ChangeNotifierProvider(create: (_) => SelectedTaskMenu()),
+      ChangeNotifierProvider(create: (_) => SelectedTaskMenuProvider()),
     ],
     child: MyApp(), // application root
   ));
@@ -38,11 +38,9 @@ class _MyAppState extends State<MyApp> {
   ///
   /// If database exists load tasks else create database
   void _setUpDatabase() async {
-    if (!await DatabaseProvider.checkIfDatabaseExists()) {
-      DatabaseProvider.createDatabase();
+    if (!await DatabaseAccess.checkIfDatabaseExists()) {
+      DatabaseAccess.createDatabase();
     }
-
-    Provider.of<DatabaseProvider>(context, listen: false).loadTasks();
   }
 
   @override

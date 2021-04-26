@@ -25,11 +25,16 @@ String getFilesDirectory() {
   }
 }
 
+/// Enum containing list of allowed database loading status.
+enum DatabaseStatus { Loaded, NotLoaded, FileMissing }
+
+/// Enum of database related operations by application
+enum DatabaseOps { TaskAdded, TaskUpdated, TaskDeleted }
+
 /// The class for storing database related methods. Also used with provider
 /// package for state management of the app.
 class DatabaseProvider extends ChangeNotifier {
   DatabaseStatus _status = DatabaseStatus.NotLoaded;
-  var _tasksList = <TaskItem>[];
 
   get dbStatus => _status;
   set dbStatus(DatabaseStatus s) {
@@ -37,9 +42,17 @@ class DatabaseProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  List<TaskItem> get tasks => UnmodifiableListView(_tasksList);
+  DatabaseOps _lastOp;
 
-  DatabaseProvider() {
+  get lastOp => _lastOp;
+  set lastOp(DatabaseOps op) {
+    _lastOp = op;
+    notifyListeners();
+  }
+}
+
+class DatabaseAccess {
+  DatabaseAccess() {
     // change default sqlite3 dll loading behaviour for windows.
     // This allows the use of dll shipped along with executable
     open.overrideFor(OperatingSystem.windows, _openOnWindows);
@@ -51,85 +64,6 @@ class DatabaseProvider extends ChangeNotifier {
     final filesDir = getFilesDirectory();
     dllFile = File('$filesDir\\sqlite3.dll');
     return DynamicLibrary.open(dllFile.path);
-  }
-
-  /// load tasks from database and notify listeners
-  ///
-  /// Used for loading the task details into flutter widgets
-  /// After each operation in database, ensure to reload tasks
-  /// to update the user interface
-  void loadTasks() {
-    final db = sqlite3.open(
-      '${getFilesDirectory()}\\tasking.db',
-      mode: OpenMode.readOnly,
-    );
-
-    final resultSet = db.select('''SELECT * FROM TASKS''');
-    _tasksList.clear();
-    resultSet.forEach((row) {
-      _tasksList.add(TaskItem(
-          id: row['task_id'],
-          name: row['name'],
-          status: row['status'] == 'completed'
-              ? TaskItemStatus.Completed
-              : TaskItemStatus.Pending));
-    });
-    notifyListeners();
-  }
-
-  /// Add new task to database and set it's status to `pending`
-  void addNewTask({String name}) {
-    final db = sqlite3.open(
-      '${getFilesDirectory()}\\tasking.db',
-      mode: OpenMode.readWrite,
-    );
-
-    final currentTime = DateTime.now().millisecondsSinceEpoch;
-
-    final stmt = db.prepare(
-        'INSERT INTO tasks (name, status, createdon) VALUES (?, "pending", ?)');
-    stmt.execute([name, currentTime]);
-    stmt.dispose();
-    db.dispose();
-  }
-
-  /// Delete an existing task from database
-  void deleteTask({int taskId}) {
-    final db = sqlite3.open(
-      '${getFilesDirectory()}\\tasking.db',
-      mode: OpenMode.readWrite,
-    );
-
-    db.execute('DELETE FROM tasks WHERE task_id="$taskId"');
-    db.dispose();
-  }
-
-  /// Set the task status to either `completed` or `pending`
-  void setTaskStatus({int taskId, TaskItemStatus status}) {
-    final db = sqlite3.open(
-      '${getFilesDirectory()}\\tasking.db',
-      mode: OpenMode.readWrite,
-    );
-
-    final currentTime = DateTime.now().millisecondsSinceEpoch;
-
-    if (status == TaskItemStatus.Completed) {
-      db.execute('''UPDATE tasks 
-      SET 
-        status="completed",
-        completedon=$currentTime,
-        modifiedon=$currentTime
-        WHERE task_id=$taskId''');
-    } else if (status == TaskItemStatus.Pending) {
-      db.execute('''UPDATE tasks 
-          SET 
-            status="pending", 
-            completedon="NULL", 
-            modifiedon=$currentTime 
-          WHERE 
-            task_id=$taskId''');
-    }
-    db.dispose();
   }
 
   /// check if database file exists and return a boolean future
@@ -162,7 +96,87 @@ class DatabaseProvider extends ChangeNotifier {
     db.execute(sqlCreateTasksTable);
     db.dispose();
   }
-}
 
-/// Enum containing list of allowed database loading status.
-enum DatabaseStatus { Loaded, NotLoaded, FileMissing }
+  /// Add new task to database and set it's status to `pending`
+  static void addNewTask({String name}) {
+    final db = sqlite3.open(
+      '${getFilesDirectory()}\\tasking.db',
+      mode: OpenMode.readWrite,
+    );
+
+    final currentTime = DateTime.now().millisecondsSinceEpoch;
+
+    final stmt = db.prepare(
+        'INSERT INTO tasks (name, status, createdon) VALUES (?, "pending", ?)');
+    stmt.execute([name, currentTime]);
+    stmt.dispose();
+    db.dispose();
+  }
+
+  /// Delete an existing task from database
+  static void deleteTask({int taskId}) {
+    final db = sqlite3.open(
+      '${getFilesDirectory()}\\tasking.db',
+      mode: OpenMode.readWrite,
+    );
+
+    db.execute('DELETE FROM tasks WHERE task_id="$taskId"');
+    db.dispose();
+  }
+
+  /// Set the task status to either `completed` or `pending`
+  static void setTaskStatus({int taskId, TaskItemStatus status}) {
+    final db = sqlite3.open(
+      '${getFilesDirectory()}\\tasking.db',
+      mode: OpenMode.readWrite,
+    );
+
+    final currentTime = DateTime.now().millisecondsSinceEpoch;
+
+    if (status == TaskItemStatus.Completed) {
+      db.execute('''UPDATE tasks 
+      SET 
+        status="completed",
+        completedon=$currentTime,
+        modifiedon=$currentTime
+        WHERE task_id=$taskId''');
+    } else if (status == TaskItemStatus.Pending) {
+      db.execute('''UPDATE tasks 
+          SET 
+            status="pending", 
+            completedon="NULL", 
+            modifiedon=$currentTime 
+          WHERE 
+            task_id=$taskId''');
+    }
+    db.dispose();
+  }
+
+  static List<TaskItem> getTasks(TaskMenuItemTag filter) {
+    final db = sqlite3.open(
+      '${getFilesDirectory()}\\tasking.db',
+      mode: OpenMode.readOnly,
+    );
+
+    var qry = '''SELECT * FROM TASKS''';
+
+    if (filter == TaskMenuItemTag.Completed) {
+      qry = '''SELECT * FROM TASKS WHERE status ="completed" ''';
+    } else if (filter == TaskMenuItemTag.Planned) {
+      qry = '''SELECT * FROM TASKS WHERE completedon IS NULL''';
+    }
+
+    final resultSet = db.select(qry);
+    var tasksList = <TaskItem>[];
+    resultSet.forEach((row) {
+      tasksList.add(TaskItem(
+          id: row['task_id'],
+          name: row['name'],
+          status: row['status'] == 'completed'
+              ? TaskItemStatus.Completed
+              : TaskItemStatus.Pending));
+    });
+
+    return tasksList;
+  }
+}

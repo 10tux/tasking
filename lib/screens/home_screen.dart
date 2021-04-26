@@ -31,7 +31,7 @@ class MyHomePage extends StatelessWidget {
               child: Column(
                 children: [
                   Expanded(
-                    child: TasksList(),
+                    child: TasksListWidget(),
                   ),
                   Container(
                     margin: EdgeInsets.all(20.0),
@@ -52,7 +52,7 @@ class MyHomePage extends StatelessWidget {
 class TaskCategoryMenu extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Consumer<SelectedTaskMenu>(builder: (context, stm, _) {
+    return Consumer<SelectedTaskMenuProvider>(builder: (context, stm, _) {
       return ListView(
         children: [
           Padding(
@@ -105,11 +105,12 @@ class TaskMenuItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<SelectedTaskMenu>(
+    return Consumer<SelectedTaskMenuProvider>(
       builder: (context, stm, _) {
         return TextButton(
           onPressed: () {
             stm.selectedItem = tag;
+            stm.tasks = DatabaseAccess.getTasks(tag);
           },
           clipBehavior: Clip.hardEdge,
           child: ListTile(
@@ -126,28 +127,32 @@ class TaskMenuItem extends StatelessWidget {
 }
 
 /// Widget to display all tasks
-class TasksList extends StatefulWidget {
-  TasksList({Key key}) : super(key: key);
+class TasksListWidget extends StatelessWidget {
+  TasksListWidget({Key key}) : super(key: key);
 
-  @override
-  State<StatefulWidget> createState() => _TasksListState();
-}
+  final _scrollController =
+      ScrollController(); // store list of tasks to be displayed
 
-class _TasksListState extends State<TasksList> {
-  final _scrollController = ScrollController();
+  reloadTasks(BuildContext context) async {
+    final selectedTag =
+        Provider.of<SelectedTaskMenuProvider>(context).selectedItem;
+    Provider.of<SelectedTaskMenuProvider>(context).tasks =
+        DatabaseAccess.getTasks(selectedTag);
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<DatabaseProvider>(
-      builder: (context, dbp, _) {
+    return Consumer2<DatabaseProvider, SelectedTaskMenuProvider>(
+      builder: (context, dbp, stmp, _) {
+        reloadTasks(context);
         return Scrollbar(
           isAlwaysShown: true,
           controller: _scrollController,
           child: ListView.builder(
-            itemCount: dbp.tasks.length,
+            itemCount: stmp.tasks.length,
             controller: _scrollController,
             itemBuilder: (context, index) {
-              return Card(child: TaskWidget(task: dbp.tasks[index]));
+              return Card(child: TaskWidget(task: stmp.tasks[index]));
             },
           ),
         );
@@ -190,13 +195,13 @@ class TaskWidget extends StatelessWidget {
             ),
             onPressed: () {
               if (this.status == TaskItemStatus.Pending) {
-                dbp.setTaskStatus(
+                DatabaseAccess.setTaskStatus(
                     taskId: this.id, status: TaskItemStatus.Completed);
               } else {
-                dbp.setTaskStatus(
+                DatabaseAccess.setTaskStatus(
                     taskId: this.id, status: TaskItemStatus.Pending);
               }
-              dbp.loadTasks();
+              dbp.lastOp = DatabaseOps.TaskUpdated;
             },
             splashRadius: 20.0,
           ),
@@ -219,8 +224,8 @@ class TaskWidget extends StatelessWidget {
             splashRadius: 20.0,
             splashColor: Colors.red.shade200,
             onPressed: () {
-              dbp.deleteTask(taskId: this.id);
-              dbp.loadTasks();
+              DatabaseAccess.deleteTask(taskId: this.id);
+              dbp.lastOp = DatabaseOps.TaskDeleted;
             },
           ),
         );
@@ -282,8 +287,8 @@ class _AddTaskState extends State<AddTask> {
                   ),
                   tooltip: 'Add a new task',
                   onPressed: () {
-                    dbp.addNewTask(name: this.taskName);
-                    dbp.loadTasks();
+                    DatabaseAccess.addNewTask(name: this.taskName);
+                    dbp.lastOp = DatabaseOps.TaskAdded;
                   },
                 ),
               ),
