@@ -100,7 +100,7 @@ class DatabaseProvider extends ChangeNotifier {
       mode: OpenMode.readWrite,
     );
 
-    final stmt = db.execute('DELETE FROM tasks WHERE task_id="$taskId"');
+    db.execute('DELETE FROM tasks WHERE task_id="$taskId"');
     db.dispose();
   }
 

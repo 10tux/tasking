@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 
 import 'screens/home_screen.dart';
 import 'logic/database.dart';
+import 'logic/data_structures.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -11,6 +12,7 @@ void main() {
   runApp(MultiProvider(
     providers: [
       ChangeNotifierProvider(create: (_) => DatabaseProvider()),
+      ChangeNotifierProvider(create: (_) => SelectedTaskMenu()),
     ],
     child: MyApp(), // application root
   ));

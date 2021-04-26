@@ -50,28 +50,77 @@ class MyHomePage extends StatelessWidget {
 
 /// Menu for filtering tasks
 class TaskCategoryMenu extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<SelectedTaskMenu>(builder: (context, stm, _) {
+      return ListView(
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(4.0, 4.0, 2.0, 2.0),
+            child: TaskMenuItem(
+              icon: Icon(Icons.date_range_rounded),
+              text: 'Planned',
+              selected: stm.selectedItem == TaskMenuItemTag.Planned,
+              tag: TaskMenuItemTag.Planned,
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(4.0, 2.0, 2.0, 2.0),
+            child: TaskMenuItem(
+              icon: Icon(Icons.all_inclusive_rounded),
+              text: 'Completed',
+              selected: stm.selectedItem == TaskMenuItemTag.Completed,
+              tag: TaskMenuItemTag.Completed,
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(4.0, 2.0, 2.0, 4.0),
+            child: TaskMenuItem(
+              icon: Icon(Icons.check_circle_outline_rounded),
+              text: 'All tasks',
+              selected: stm.selectedItem == TaskMenuItemTag.AllTasks,
+              tag: TaskMenuItemTag.AllTasks,
+            ),
+          ),
+        ],
+      );
+    });
+  }
+}
+
+/// Each menu item in `TaskCategoryMenu`
+class TaskMenuItem extends StatelessWidget {
+  final Icon menuIcon;
+  final String menuText;
+  final bool isSelected;
+  final TaskMenuItemTag tag;
+
+  TaskMenuItem(
+      {Key key, Icon icon, String text, bool selected, TaskMenuItemTag tag})
+      : this.menuIcon = icon,
+        this.menuText = text,
+        this.isSelected = selected,
+        this.tag = tag,
+        super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return ListView(
-      children: [
-        ListTile(
-          leading: Icon(Icons.date_range_rounded),
-          title: Text('Planned'),
-          hoverColor: Colors.black38,
-          dense: true,
-        ),
-        ListTile(
-          leading: Icon(Icons.all_inclusive_rounded),
-          title: Text('All'),
-          dense: true,
-        ),
-        ListTile(
-          leading: Icon(Icons.check_circle_outline_rounded),
-          title: Text('Completed'),
-          dense: true,
-        ),
-      ],
+    return Consumer<SelectedTaskMenu>(
+      builder: (context, stm, _) {
+        return TextButton(
+          onPressed: () {
+            stm.selectedItem = tag;
+          },
+          clipBehavior: Clip.hardEdge,
+          child: ListTile(
+            leading: menuIcon,
+            selected: isSelected,
+            selectedTileColor: Colors.blue[50],
+            title: Text(menuText),
+            dense: true,
+          ),
+        );
+      },
     );
   }
 }
@@ -114,15 +163,15 @@ class _TasksListState extends State<TasksList> {
 /// Pressing task status button toggles the task status
 /// and reloads all the tasks
 class TaskWidget extends StatelessWidget {
-  int id;
-  String name;
-  TaskItemStatus status;
+  final int id;
+  final String name;
+  final TaskItemStatus status;
 
-  TaskWidget({Key key, TaskItem task}) : super(key: key) {
-    id = task.id;
-    name = task.name;
-    status = task.status;
-  }
+  TaskWidget({Key key, TaskItem task})
+      : this.id = task.id,
+        this.status = task.status,
+        this.name = task.name,
+        super(key: key);
 
   @override
   Widget build(BuildContext context) {
