@@ -142,19 +142,23 @@ class TasksListWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer2<DatabaseProvider, SelectedTaskMenuProvider>(
-      builder: (context, dbp, stmp, _) {
+    return Consumer<DatabaseProvider>(
+      builder: (context, dbp, _) {
         reloadTasks(context);
-        return Scrollbar(
-          isAlwaysShown: true,
-          controller: _scrollController,
-          child: ListView.builder(
-            itemCount: stmp.tasks.length,
-            controller: _scrollController,
-            itemBuilder: (context, index) {
-              return Card(child: TaskWidget(task: stmp.tasks[index]));
-            },
-          ),
+        return Consumer<SelectedTaskMenuProvider>(
+          builder: (context, stmp, _) {
+            return Scrollbar(
+              isAlwaysShown: true,
+              controller: _scrollController,
+              child: ListView.builder(
+                itemCount: stmp.tasks.length,
+                controller: _scrollController,
+                itemBuilder: (context, index) {
+                  return Card(child: TaskWidget(task: stmp.tasks[index]));
+                },
+              ),
+            );
+          },
         );
       },
     );

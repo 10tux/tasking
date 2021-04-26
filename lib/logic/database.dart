@@ -163,7 +163,7 @@ class DatabaseAccess {
     if (filter == TaskMenuItemTag.Completed) {
       qry = '''SELECT * FROM TASKS WHERE status ="completed" ''';
     } else if (filter == TaskMenuItemTag.Planned) {
-      qry = '''SELECT * FROM TASKS WHERE completedon IS NULL''';
+      qry = '''SELECT * FROM TASKS WHERE status ="pending"''';
     }
 
     final resultSet = db.select(qry);
