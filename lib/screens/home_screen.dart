@@ -110,7 +110,6 @@ class TaskMenuItem extends StatelessWidget {
         return TextButton(
           onPressed: () {
             stm.selectedItem = tag;
-            stm.tasks = DatabaseAccess.getTasks(tag);
           },
           clipBehavior: Clip.hardEdge,
           child: ListTile(
@@ -133,32 +132,21 @@ class TasksListWidget extends StatelessWidget {
   final _scrollController =
       ScrollController(); // store list of tasks to be displayed
 
-  reloadTasks(BuildContext context) async {
-    final selectedTag =
-        Provider.of<SelectedTaskMenuProvider>(context).selectedItem;
-    Provider.of<SelectedTaskMenuProvider>(context).tasks =
-        DatabaseAccess.getTasks(selectedTag);
-  }
-
   @override
   Widget build(BuildContext context) {
-    return Consumer<DatabaseProvider>(
-      builder: (context, dbp, _) {
-        reloadTasks(context);
-        return Consumer<SelectedTaskMenuProvider>(
-          builder: (context, stmp, _) {
-            return Scrollbar(
-              isAlwaysShown: true,
-              controller: _scrollController,
-              child: ListView.builder(
-                itemCount: stmp.tasks.length,
-                controller: _scrollController,
-                itemBuilder: (context, index) {
-                  return Card(child: TaskWidget(task: stmp.tasks[index]));
-                },
-              ),
-            );
-          },
+    return Consumer2<DatabaseProvider, SelectedTaskMenuProvider>(
+      builder: (context, dbp, stmp, _) {
+        final _tasks = DatabaseAccess.getTasks(stmp.selectedItem);
+        return Scrollbar(
+          isAlwaysShown: true,
+          controller: _scrollController,
+          child: ListView.builder(
+            itemCount: _tasks.length,
+            controller: _scrollController,
+            itemBuilder: (context, index) {
+              return Card(child: TaskWidget(task: _tasks[index]));
+            },
+          ),
         );
       },
     );

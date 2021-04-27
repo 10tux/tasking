@@ -31,7 +31,16 @@ class SelectedTaskMenuProvider extends ChangeNotifier {
     this._selectedItem = newSelection;
     notifyListeners();
   }
+}
 
+/// Enum of possible values for selected task menu
+///
+/// Each item in this enum corresponds with the list of menu widgets in
+/// `TaskCategeoryMenu` of the same name.
+enum TaskMenuItemTag { Planned, Completed, AllTasks }
+
+/// Hold the details of currently displayed tasks
+class CurrentDisplayedTasks extends ChangeNotifier {
   var _tasks = <TaskItem>[];
 
   get tasks => _tasks;
@@ -40,9 +49,3 @@ class SelectedTaskMenuProvider extends ChangeNotifier {
     notifyListeners();
   }
 }
-
-/// Enum of possible values for selected task menu
-///
-/// Each item in this enum corresponds with the list of menu widgets in
-/// `TaskCategeoryMenu` of the same name.
-enum TaskMenuItemTag { Planned, Completed, AllTasks }

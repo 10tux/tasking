@@ -13,6 +13,7 @@ void main() {
     providers: [
       ChangeNotifierProvider(create: (_) => DatabaseProvider()),
       ChangeNotifierProvider(create: (_) => SelectedTaskMenuProvider()),
+      ChangeNotifierProvider(create: (_) => CurrentDisplayedTasks()),
     ],
     child: MyApp(), // application root
   ));

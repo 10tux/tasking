@@ -2,8 +2,6 @@
 /// Implemented based on sqlite3 database
 /// Currently supports only for Windows Desktop
 
-import 'dart:collection';
-
 import 'dart:ffi';
 import 'dart:io';
 
