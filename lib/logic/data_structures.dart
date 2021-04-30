@@ -37,7 +37,7 @@ class SelectedTaskMenuProvider extends ChangeNotifier {
 ///
 /// Each item in this enum corresponds with the list of menu widgets in
 /// `TaskCategeoryMenu` of the same name.
-enum TaskMenuItemTag { Planned, Completed, AllTasks }
+enum TaskMenuItemTag { Today, Planned, Completed, AllTasks }
 
 /// Hold the details of currently displayed tasks
 class CurrentDisplayedTasks extends ChangeNotifier {

@@ -88,6 +88,7 @@ class DatabaseAccess {
         status VARCHAR(50),
         createdon INTEGER,
         modifiedon INTEGER,
+        scheduledon STRING,
         completedon INTEGER
       )
     """;
@@ -156,12 +157,15 @@ class DatabaseAccess {
       mode: OpenMode.readOnly,
     );
 
+    final todayDate = getTodayDate();
     var qry = '''SELECT * FROM TASKS''';
 
     if (filter == TaskMenuItemTag.Completed) {
-      qry = '''SELECT * FROM TASKS WHERE status ="completed" ''';
+      qry = '''SELECT * FROM TASKS WHERE status = "completed" ''';
     } else if (filter == TaskMenuItemTag.Planned) {
-      qry = '''SELECT * FROM TASKS WHERE status ="pending"''';
+      qry = '''SELECT * FROM TASKS WHERE status = "pending"''';
+    } else if (filter == TaskMenuItemTag.Planned) {
+      qry = '''SELECT * FROM TASKS WHERE scheduledon = $todayDate''';
     }
 
     final resultSet = db.select(qry);
@@ -177,4 +181,10 @@ class DatabaseAccess {
 
     return tasksList;
   }
+}
+
+String getTodayDate() {
+  final currentDateTime = DateTime.now(); // local time zone
+  final todayDate = currentDateTime.toString();
+  return todayDate.substring(0, 10);
 }

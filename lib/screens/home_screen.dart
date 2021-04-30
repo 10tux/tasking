@@ -58,6 +58,15 @@ class TaskCategoryMenu extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.fromLTRB(4.0, 4.0, 2.0, 2.0),
             child: TaskMenuItem(
+              icon: Icon(Icons.golf_course_rounded),
+              text: 'Today',
+              selected: stm.selectedItem == TaskMenuItemTag.Today,
+              tag: TaskMenuItemTag.Planned,
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(4.0, 4.0, 2.0, 2.0),
+            child: TaskMenuItem(
               icon: Icon(Icons.date_range_rounded),
               text: 'Planned',
               selected: stm.selectedItem == TaskMenuItemTag.Planned,
@@ -67,7 +76,7 @@ class TaskCategoryMenu extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.fromLTRB(4.0, 2.0, 2.0, 2.0),
             child: TaskMenuItem(
-              icon: Icon(Icons.all_inclusive_rounded),
+              icon: Icon(Icons.check_circle_outline_rounded),
               text: 'Completed',
               selected: stm.selectedItem == TaskMenuItemTag.Completed,
               tag: TaskMenuItemTag.Completed,
@@ -76,7 +85,7 @@ class TaskCategoryMenu extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.fromLTRB(4.0, 2.0, 2.0, 4.0),
             child: TaskMenuItem(
-              icon: Icon(Icons.check_circle_outline_rounded),
+              icon: Icon(Icons.all_inclusive_rounded),
               text: 'All tasks',
               selected: stm.selectedItem == TaskMenuItemTag.AllTasks,
               tag: TaskMenuItemTag.AllTasks,
