@@ -24,7 +24,7 @@ enum TaskItemStatus { Completed, Pending }
 /// Datastructure for state management using provider package.
 /// Holds the current selected menu item details
 class SelectedTaskMenuProvider extends ChangeNotifier {
-  TaskMenuItemTag _selectedItem = TaskMenuItemTag.Planned;
+  TaskMenuItemTag _selectedItem = TaskMenuItemTag.Pending;
 
   TaskMenuItemTag get selectedItem => _selectedItem;
   set selectedItem(TaskMenuItemTag newSelection) {
@@ -37,7 +37,7 @@ class SelectedTaskMenuProvider extends ChangeNotifier {
 ///
 /// Each item in this enum corresponds with the list of menu widgets in
 /// `TaskCategeoryMenu` of the same name.
-enum TaskMenuItemTag { Today, Planned, Completed, AllTasks }
+enum TaskMenuItemTag { Today, Pending, Completed, AllTasks }
 
 /// Hold the details of currently displayed tasks
 class CurrentDisplayedTasks extends ChangeNotifier {

@@ -162,9 +162,9 @@ class DatabaseAccess {
 
     if (filter == TaskMenuItemTag.Completed) {
       qry = '''SELECT * FROM TASKS WHERE status = "completed" ''';
-    } else if (filter == TaskMenuItemTag.Planned) {
+    } else if (filter == TaskMenuItemTag.Pending) {
       qry = '''SELECT * FROM TASKS WHERE status = "pending"''';
-    } else if (filter == TaskMenuItemTag.Planned) {
+    } else if (filter == TaskMenuItemTag.Today) {
       qry = '''SELECT * FROM TASKS WHERE scheduledon = $todayDate''';
     }
 
@@ -183,8 +183,8 @@ class DatabaseAccess {
   }
 }
 
-String getTodayDate() {
+int getTodayDate() {
   final currentDateTime = DateTime.now(); // local time zone
   final todayDate = currentDateTime.toString();
-  return todayDate.substring(0, 10);
+  return int.parse(todayDate.substring(0, 10).replaceAll(RegExp(r'-'), ''));
 }

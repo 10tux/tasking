@@ -61,16 +61,16 @@ class TaskCategoryMenu extends StatelessWidget {
               icon: Icon(Icons.golf_course_rounded),
               text: 'Today',
               selected: stm.selectedItem == TaskMenuItemTag.Today,
-              tag: TaskMenuItemTag.Planned,
+              tag: TaskMenuItemTag.Today,
             ),
           ),
           Padding(
             padding: const EdgeInsets.fromLTRB(4.0, 4.0, 2.0, 2.0),
             child: TaskMenuItem(
               icon: Icon(Icons.date_range_rounded),
-              text: 'Planned',
-              selected: stm.selectedItem == TaskMenuItemTag.Planned,
-              tag: TaskMenuItemTag.Planned,
+              text: 'Pending',
+              selected: stm.selectedItem == TaskMenuItemTag.Pending,
+              tag: TaskMenuItemTag.Pending,
             ),
           ),
           Padding(
