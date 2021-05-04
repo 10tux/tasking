@@ -2,7 +2,8 @@ import 'package:desktop_window/desktop_window.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'screens/home_screen.dart';
+import 'screens/tasks_screen.dart';
+import 'screens/activities_screen.dart';
 import 'logic/database.dart';
 import 'logic/data_structures.dart';
 
@@ -55,7 +56,10 @@ class _MyAppState extends State<MyApp> {
             subtitle1: TextStyle(fontSize: 14),
             subtitle2: TextStyle(fontSize: 14),
           )),
-      home: MyHomePage(title: 'Tasking'), // Landing page with task details
+      routes: {
+        '/': (context) => TasksScreen(), // Landing page with task details
+        '/activities': (context) => ActivitiesScreen(),
+      },
     );
   }
 }

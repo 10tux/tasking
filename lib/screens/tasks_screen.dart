@@ -2,25 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../logic/database.dart';
 import '../logic/data_structures.dart';
+import 'widgets/app_bar.dart';
 
 /// Landing page with all task details
 ///
 /// Widget contains a header with application name
 /// On the left lies the menu for filtering tasks
 /// On the right list of tasks are displayed
-/// Towars the bottom input provided for new taks
-class MyHomePage extends StatelessWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
-
-  final String title;
+/// Towards the bottom an input box is provided for new taks
+class TasksScreen extends StatelessWidget {
+  TasksScreen({Key key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(title),
-        elevation: 0,
-      ),
+      appBar: taskingAppBar(context),
       body: Container(
         child: Row(
           children: [
@@ -265,6 +261,7 @@ class _AddTaskState extends State<AddTask> {
                 decoration: const InputDecoration(
                   hintText: "Add the task on your mind!",
                   border: OutlineInputBorder(),
+                  isDense: true,
                 ),
                 onChanged: (value) {
                   this.setState(() {
