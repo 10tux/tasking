@@ -96,8 +96,9 @@ class DatabaseAccess {
     db.dispose();
   }
 
-  /// Add new task to database and set it's status to `pending`
-  static void addNewTask({String name}) {
+  /// Add new task to database
+  static void addNewTask(
+      {String name, TaskItemStatus status, String scheduledOn}) {
     final db = sqlite3.open(
       '${getFilesDirectory()}\\tasking.db',
       mode: OpenMode.readWrite,
@@ -105,9 +106,24 @@ class DatabaseAccess {
 
     final currentTime = DateTime.now().millisecondsSinceEpoch;
 
+    String statusText = 'pending';
+
+    switch (status) {
+      case TaskItemStatus.Pending:
+        statusText = 'pending';
+        break;
+
+      case TaskItemStatus.Completed:
+        statusText = 'completed';
+        break;
+
+      default:
+        statusText = 'pending';
+    }
+
     final stmt = db.prepare(
-        'INSERT INTO tasks (name, status, createdon) VALUES (?, "pending", ?)');
-    stmt.execute([name, currentTime]);
+        'INSERT INTO tasks (name, status, createdon, scheduledon) VALUES (?, ?, ?, ?)');
+    stmt.execute([name, statusText, currentTime, scheduledOn]);
     stmt.dispose();
     db.dispose();
   }
@@ -151,6 +167,20 @@ class DatabaseAccess {
     db.dispose();
   }
 
+  /// update the task witch provided scheduled date
+  static void scheduleTask({int taskId, String scheduledOn}) {
+    final db = sqlite3.open(
+      '${getFilesDirectory()}\\tasking.db',
+      mode: OpenMode.readWrite,
+    );
+
+    final qry =
+        '''UPDATE tasks SET scheduledon=$scheduledOn WHERE task_id=$taskId''';
+    db.execute(qry);
+    db.dispose();
+  }
+
+  /// get list of all tasks in the database
   static List<TaskItem> getTasks(TaskMenuItemTag filter) {
     final db = sqlite3.open(
       '${getFilesDirectory()}\\tasking.db',
@@ -183,6 +213,7 @@ class DatabaseAccess {
   }
 }
 
+/// get todays date in YYYYMMDD format.
 int getTodayDate() {
   final currentDateTime = DateTime.now(); // local time zone
   final todayDate = currentDateTime.toString();

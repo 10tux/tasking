@@ -2,10 +2,10 @@ import 'package:desktop_window/desktop_window.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'screens/tasks_screen.dart';
-import 'screens/activities_screen.dart';
 import 'logic/database.dart';
 import 'logic/data_structures.dart';
+import 'screens/tasks_screen.dart';
+import 'screens/activities_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -58,7 +58,7 @@ class _MyAppState extends State<MyApp> {
           )),
       routes: {
         '/': (context) => TasksScreen(), // Landing page with task details
-        '/activities': (context) => ActivitiesScreen(),
+        '/activities': (context) => ActivitiesScreen(), // activities page
       },
     );
   }

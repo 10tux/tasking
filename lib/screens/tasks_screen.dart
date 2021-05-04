@@ -216,13 +216,18 @@ class TaskWidget extends StatelessWidget {
           trailing: PopupMenuButton(
             itemBuilder: (BuildContext context) => [
               PopupMenuItem(
-                child: TextButton(
+                child: OutlinedButton(
                   child: Text('Add to Today'),
-                  onPressed: () {},
+                  onPressed: () {
+                    DatabaseAccess.scheduleTask(
+                        taskId: this.id,
+                        scheduledOn: getTodayDate().toString());
+                    dbp.lastOp = DatabaseOps.TaskUpdated;
+                  },
                 ),
               ),
               PopupMenuItem(
-                child: TextButton(
+                child: OutlinedButton(
                   child: Text('Delete Task'),
                   onPressed: () {
                     DatabaseAccess.deleteTask(taskId: this.id);
@@ -292,7 +297,30 @@ class _AddTaskState extends State<AddTask> {
                   ),
                   tooltip: 'Add a new task',
                   onPressed: () {
-                    DatabaseAccess.addNewTask(name: this.taskName);
+                    final selectedMenu = Provider.of<SelectedTaskMenuProvider>(
+                            context,
+                            listen: false)
+                        .selectedItem;
+                    switch (selectedMenu) {
+                      case TaskMenuItemTag.AllTasks:
+                        DatabaseAccess.addNewTask(name: this.taskName);
+                        break;
+
+                      case TaskMenuItemTag.Completed:
+                        DatabaseAccess.addNewTask(
+                            name: this.taskName,
+                            status: TaskItemStatus.Completed);
+                        break;
+
+                      case TaskMenuItemTag.Pending:
+                        DatabaseAccess.addNewTask(name: this.taskName);
+                        break;
+
+                      case TaskMenuItemTag.Today:
+                        DatabaseAccess.addNewTask(
+                            name: this.taskName,
+                            scheduledOn: getTodayDate().toString());
+                    }
                     dbp.lastOp = DatabaseOps.TaskAdded;
                   },
                 ),
