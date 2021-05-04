@@ -213,17 +213,24 @@ class TaskWidget extends StatelessWidget {
             'Task #${this.id}',
             style: TextStyle(color: Colors.black12),
           ),
-          trailing: IconButton(
-            icon: Icon(
-              Icons.delete_rounded,
-              color: Colors.redAccent,
-            ),
-            splashRadius: 20.0,
-            splashColor: Colors.red.shade200,
-            onPressed: () {
-              DatabaseAccess.deleteTask(taskId: this.id);
-              dbp.lastOp = DatabaseOps.TaskDeleted;
-            },
+          trailing: PopupMenuButton(
+            itemBuilder: (BuildContext context) => [
+              PopupMenuItem(
+                child: TextButton(
+                  child: Text('Add to Today'),
+                  onPressed: () {},
+                ),
+              ),
+              PopupMenuItem(
+                child: TextButton(
+                  child: Text('Delete Task'),
+                  onPressed: () {
+                    DatabaseAccess.deleteTask(taskId: this.id);
+                    dbp.lastOp = DatabaseOps.TaskDeleted;
+                  },
+                ),
+              ),
+            ],
           ),
         );
       },
